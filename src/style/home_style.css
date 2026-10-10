@@ -1,0 +1,37 @@
+QMainWindow {
+    background: #0f172a;
+}
+
+/* slate-900 */
+
+QWidget {
+    color: #e5e7eb;
+    font-size: 14px;
+}
+
+QPushButton {
+    background: transparent;
+    border: 1px solid #374151;
+    padding: 8px 12px;
+    text-align: left;
+    border-radius: 8px;
+}
+
+QPushButton:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.10);
+}
+
+QLabel#h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+QScrollArea {
+    background: transparent;
+    border: none;
+}

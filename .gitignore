@@ -1,0 +1,43 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Test and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Build and packaging output
+build/
+dist/
+*.egg-info/
+*.spec
+*.exe
+
+# Local database files
+*.db
+*.sqlite3
+*.db-journal
+
+# Editor/OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Project-local generated or private files
+config.py
+holidays.py
+
+# Keep source package __init__ files tracked
+!src/**/__init__.py
