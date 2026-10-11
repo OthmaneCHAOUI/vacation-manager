@@ -152,15 +152,19 @@ The application initializes the database schema through its database module.
 
 The application uses `config.py` for project configuration and `src/model/database.py` for database initialization and connections.
 
-The SQLite database is located in:
+When running from source, the SQLite database is located in:
 
 ```text
 src/data/database.db
 ```
 
-in the current source project structure.
+When running a packaged executable, the database is stored in the user's application data directory so it persists between launches:
 
-**Note for packaged builds:** A database bundled inside a PyInstaller one-file executable should not be used as the writable database location. The executable extracts bundled resources to a temporary directory. For reliable persistence, the application should use a stable writable location, such as `%LOCALAPPDATA%\vacation-manager\database.db` on Windows.
+- **Windows:** `%LOCALAPPDATA%\vacation-manager\database.db`
+- **Linux:** `$XDG_DATA_HOME/vacation-manager/database.db`, or `~/.local/share/vacation-manager/database.db` when `XDG_DATA_HOME` is not set
+- **macOS:** `~/Library/Application Support/vacation-manager/database.db`
+
+If a previous packaged build stored a database beside its bundled files and that file is still available, the application copies it to the persistent location the first time it starts. Data that only existed in a temporary extraction directory and was deleted when the old executable closed cannot be recovered.
 
 ## Usage
 

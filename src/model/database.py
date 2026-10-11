@@ -1,10 +1,35 @@
+import os
 import sqlite3
+import sys
 from pathlib import Path
+from shutil import copy2
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DB_PATH = PROJECT_ROOT / "src" / "data" / "database.db"
 
+
+def _get_database_path():
+    if not getattr(sys, "frozen", False):
+        return PROJECT_ROOT / "src" / "data" / "database.db"
+
+    if sys.platform == "win32":
+        default_data_dir = Path.home() / "AppData" / "Local"
+        data_dir = Path(os.environ.get("LOCALAPPDATA") or default_data_dir)
+    elif sys.platform == "darwin":
+        data_dir = Path.home() / "Library" / "Application Support"
+    else:
+        default_data_dir = Path.home() / ".local" / "share"
+        data_dir = Path(os.environ.get("XDG_DATA_HOME") or default_data_dir)
+
+    return data_dir / "vacation-manager" / "database.db"
+
+
+DB_PATH = _get_database_path()
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+if getattr(sys, "frozen", False):
+    legacy_db_path = PROJECT_ROOT / "src" / "data" / "database.db"
+    if legacy_db_path.is_file() and not DB_PATH.exists():
+        copy2(legacy_db_path, DB_PATH)
 
 
 def get_connection():
