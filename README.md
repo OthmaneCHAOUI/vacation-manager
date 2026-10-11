@@ -38,11 +38,8 @@ The project uses a Model-View-Controller (MVC)-inspired structure to separate da
 - Use relational database constraints to associate vacations with employees.
 - Preserve records between application sessions when the database is stored at a persistent location.
 
-<!-- ## Screenshots -->
+## Screenshots
 
-<!-- Add screenshots once they are available in the repository. -->
-
-<!--
 ### Home and Calendar
 ![vacation-manager Calendar](docs/images/calendar.png)
 
@@ -51,7 +48,7 @@ The project uses a Model-View-Controller (MVC)-inspired structure to separate da
 
 ### Vacation Management
 ![Vacation Management](docs/images/vacations.png)
--->
+
 
 ## Tech Stack
 
@@ -114,7 +111,7 @@ cd vacation-manager
 ### 2. Create a virtual environment
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 ```
 
 Activate it on Windows:
@@ -132,13 +129,13 @@ source .venv/bin/activate
 ### 3. Install dependencies
 
 ```bash
-python -m pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 If the requirements file does not include all required packages, install PyQt5 separately:
 
 ```bash
-python -m pip install PyQt5
+python3 -m pip install PyQt5
 ```
 
 ### 4. Launch the application
@@ -146,7 +143,7 @@ python -m pip install PyQt5
 From the project root:
 
 ```bash
-python -m src.main.main
+python3 -m src.main.main
 ```
 
 The application initializes the database schema through its database module.
@@ -198,7 +195,6 @@ The following manual checks are recommended when validating a build:
 vacation-manager/
 ├── assets/
 │   ├── icon.png
-│   └── icon.ico                 # If included in the build
 ├── src/
 │   ├── controller/
 │   │   ├── __init__.py
@@ -238,20 +234,18 @@ The project also uses a PyInstaller specification file when configured for execu
 Activate the virtual environment, install the dependencies, and run:
 
 ```bash
-python -m src.main.main
+python3 -m src.main.main
 ```
 
-### Build a Windows executable
+### Build an executable
 
-If the repository contains a PyInstaller specification file, build using its actual filename:
+Build using the PyInstaller specification file:
 
 ```bash
-python -m PyInstaller --clean --noconfirm vacation-manager.spec
+python3 -m PyInstaller --clean --noconfirm --distpath bin vacman.spec
 ```
 
-Replace `vacation-manager.spec` if your specification file has a different name.
-
-The generated executable is typically placed in the `dist/` directory.
+The generated executable is placed in `bin/`. PyInstaller builds for the operating system on which it runs; building on Linux produces a Linux executable, not a Windows `.exe`.
 
 For debugging, enable the console in the PyInstaller configuration temporarily so that Python exceptions are visible. Disable it again for a normal GUI release.
 

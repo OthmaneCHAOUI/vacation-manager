@@ -23,12 +23,10 @@ class EmployeeView(QWidget):
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(20)
 
-        # --- Title ---
-        title = QLabel("Employés")
+        title = QLabel("Employees")
         title.setObjectName("h1")
         layout.addWidget(title)
 
-        # --- Form ---
         form_layout = QHBoxLayout()
         form_layout.setSpacing(12)
 
@@ -52,30 +50,30 @@ class EmployeeView(QWidget):
         """
 
         self.first_name_input = QLineEdit()
-        self.first_name_input.setPlaceholderText("Prénom")
+        self.first_name_input.setPlaceholderText("First name")
         self.first_name_input.setStyleSheet(lineedit_style)
 
         self.last_name_input = QLineEdit()
-        self.last_name_input.setPlaceholderText("Nom")
+        self.last_name_input.setPlaceholderText("Last name")
         self.last_name_input.setStyleSheet(lineedit_style)
 
         self.position_input = QLineEdit()
-        self.position_input.setPlaceholderText("Poste / Grade")
+        self.position_input.setPlaceholderText("Job title / Grade")
         self.position_input.setStyleSheet(lineedit_style)
 
         self.last_year_remaining_input = QLineEdit()
-        self.last_year_remaining_input.setPlaceholderText("Jours restants de l'année précédente")
+        self.last_year_remaining_input.setPlaceholderText("Carryover days")
         self.last_year_remaining_input.setStyleSheet(lineedit_style)
 
         self.vacation_credit_input = QLineEdit()
-        self.vacation_credit_input.setPlaceholderText("Crédit de congés (cette année)")
+        self.vacation_credit_input.setPlaceholderText("Annual vacation allowance")
         self.vacation_credit_input.setStyleSheet(lineedit_style)
 
         self.vacation_used_input = QLineEdit()
-        self.vacation_used_input.setPlaceholderText("Congés utilisés")
+        self.vacation_used_input.setPlaceholderText("Vacation days used")
         self.vacation_used_input.setStyleSheet(lineedit_style)
 
-        self.add_button = QPushButton("Ajouter un employé")
+        self.add_button = QPushButton("Add Employee")
         self.add_button.setCursor(Qt.PointingHandCursor)
         self.add_button.setStyleSheet(
             """
@@ -91,7 +89,6 @@ class EmployeeView(QWidget):
             """
         )
 
-        # Add all inputs to form layout
         form_layout.addWidget(self.first_name_input)
         form_layout.addWidget(self.last_name_input)
         form_layout.addWidget(self.position_input)
@@ -102,23 +99,21 @@ class EmployeeView(QWidget):
 
         layout.addLayout(form_layout)
 
-        # --- Table ---
         self.table = QTableWidget()
         self.table.setColumnCount(7)
         self.table.setHorizontalHeaderLabels(
             [
-                "Prénom",
-                "Nom",
-                "Position / Grade",
-                "Jours restants de l'année précédente",
-                "Crédit de congés (cette année)",
-                "Congés utilisés",
-                "Crédit Total",
+                "First Name",
+                "Last Name",
+                "Job Title / Grade",
+                "Carryover Days",
+                "Annual Vacation Allowance",
+                "Vacation Days Used",
+                "Total Allowance",
             ]
         )
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.setSelectionBehavior(self.table.SelectRows)
-        # self.table.setSelectionMode(self.table.MultiSelection)
         self.table.setEditTriggers(QAbstractItemView.DoubleClicked)
         self.table.setStyleSheet(
             """
@@ -139,11 +134,10 @@ class EmployeeView(QWidget):
             }
             """
         )
-        self.table.verticalHeader().setVisible(False)  # <-- Add this line to hide the left index column
+        self.table.verticalHeader().setVisible(False)
         layout.addWidget(self.table, 1)
 
-        # --- Delete button ---
-        self.delete_button = QPushButton("Supprimer la sélection")
+        self.delete_button = QPushButton("Delete Selected")
         self.delete_button.setCursor(Qt.PointingHandCursor)
         self.delete_button.setStyleSheet(
             """
@@ -160,12 +154,10 @@ class EmployeeView(QWidget):
         )
         layout.addWidget(self.delete_button)
 
-        # Connect signals
         self.delete_button.clicked.connect(self.on_delete_clicked)
         self.table.cellChanged.connect(self.on_cell_changed)
         self.add_button.clicked.connect(self.on_add_clicked)
 
-        # Internal mapping for row to employee ID
         self.row_to_emp_id = {}
 
     def load_employees(self, employees):
@@ -176,7 +168,6 @@ class EmployeeView(QWidget):
             self.table.insertRow(row)
             self.row_to_emp_id[row] = emp["id"]
 
-            # Editable fields
             self.table.setItem(row, 0, QTableWidgetItem(emp["first_name"]))
             self.table.setItem(row, 1, QTableWidgetItem(emp["last_name"]))
             self.table.setItem(row, 2, QTableWidgetItem(emp["position"]))
@@ -184,20 +175,21 @@ class EmployeeView(QWidget):
             self.table.setItem(row, 4, QTableWidgetItem(str(emp["vacation_credit"])))
             self.table.setItem(row, 5, QTableWidgetItem(str(emp["vacation_used"])))
 
-            # Total Credit = last_year_remaining + vacation_credit (non editable)
             total_credit = emp["last_year_remaining"] + emp["vacation_credit"]
             item = QTableWidgetItem(str(total_credit))
-            item.setFlags(item.flags() ^ Qt.ItemIsEditable)  # Non editable
+            item.setFlags(item.flags() ^ Qt.ItemIsEditable)
             self.table.setItem(row, 6, item)
         self.table.blockSignals(False)
 
     def confirm_delete(self, count: int) -> bool:
-        """Affiche une popup de confirmation avant la suppression."""
+        """Show a confirmation dialog before deleting employees."""
         msg = QMessageBox(self)
-        msg.setWindowTitle("Confirmation de suppression")
-        msg.setText(f"Voulez-vous vraiment supprimer {count} employé(s) ?")
+        msg.setWindowTitle("Confirm Deletion")
+        msg.setText(f"Are you sure you want to delete {count} employee(s)?")
         msg.setIcon(QMessageBox.Warning)
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg.button(QMessageBox.Yes).setText("Yes")
+        msg.button(QMessageBox.No).setText("No")
         msg.setDefaultButton(QMessageBox.No)
         msg.setStyleSheet(
             """
@@ -271,7 +263,6 @@ class EmployeeView(QWidget):
             "vacation_used": vacation_used,
         }
 
-        # Send updated data to the controller
         self.controller.update_employee(emp_id, data)
 
     def on_add_clicked(self):
@@ -283,13 +274,13 @@ class EmployeeView(QWidget):
             "vacation_credit": int(self.vacation_credit_input.text() or 0),
             "vacation_used": int(self.vacation_used_input.text() or 0),
         }
-        # Basic validation
         if not data["first_name"] or not data["last_name"]:
             msg = QMessageBox(self)
-            msg.setWindowTitle("Erreur de saisie")
-            msg.setText("Le prénom et le nom sont obligatoires.")
+            msg.setWindowTitle("Invalid Input")
+            msg.setText("First and last name are required.")
             msg.setIcon(QMessageBox.Warning)
             msg.setStandardButtons(QMessageBox.Ok)
+            msg.button(QMessageBox.Ok).setText("OK")
             msg.setStyleSheet(
                 """
                 QMessageBox {
@@ -311,7 +302,6 @@ class EmployeeView(QWidget):
             msg.exec_()
             return
         self.controller.add_employee(data)
-        # Optionally clear inputs after adding
         self.first_name_input.clear()
         self.last_name_input.clear()
         self.position_input.clear()

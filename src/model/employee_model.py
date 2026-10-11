@@ -1,4 +1,3 @@
-# src/model/employee_model.py
 from src.model.database import get_connection
 
 

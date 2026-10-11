@@ -1,9 +1,7 @@
-/* Background général du calendrier */
 QCalendarWidget QWidget {
     background: #111827;
 }
 
-/* Grille des jours */
 QCalendarWidget QTableView {
     background: #0b1220;
     color: #e5e7eb;
@@ -14,7 +12,6 @@ QCalendarWidget QTableView {
 }
 
 
-/* Boutons de navigation (mois, années) */
 QCalendarWidget QToolButton {
     color: #e5e7eb;
     background: transparent;
@@ -28,25 +25,21 @@ QCalendarWidget QToolButton:hover {
     background: rgba(255, 255, 255, 0.08);
 }
 
-/* Menu déroulant mois/année */
 QCalendarWidget QMenu {
     background: #111827;
     color: #e5e7eb;
 }
 
-/* Bordure des cellules */
 QCalendarWidget QAbstractItemView::item {
     border-radius: 6px;
     padding: 2px;
 }
 
 
-/* Hover sur les jours */
 QCalendarWidget QAbstractItemView::item:hover {
     background: #3b82f6;
 }
 
-/* Cellule sélectionnée */
 QCalendarWidget QAbstractItemView::item:selected {
     background: #2563eb;
     color: #ffffff;

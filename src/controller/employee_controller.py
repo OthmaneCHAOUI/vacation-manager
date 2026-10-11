@@ -1,4 +1,3 @@
-# src/controller/employee_controller.py
 from src.model.employee_model import EmployeeModel
 
 
@@ -8,7 +7,7 @@ class EmployeeController:
     def __init__(self, view, home_view):
         self.view = view
         self.home_view = home_view
-        self.view.controller = self  # Link view to controller
+        self.view.controller = self
 
     def load_employees(self):
         employees = EmployeeModel.get_all()

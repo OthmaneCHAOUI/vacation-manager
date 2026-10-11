@@ -30,7 +30,7 @@ class HomeView(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Workless – Vacations Manager")
+        self.setWindowTitle("Workless - Vacation Manager")
         self.resize(1100, 700)
         self.showMaximized()
 
@@ -51,7 +51,7 @@ class HomeView(QMainWindow):
             with open(css_path, "r", encoding="utf-8") as f:
                 self.setStyleSheet(f.read())
         else:
-            print(f"⚠️ Fichier CSS introuvable : {css_path}")
+            print(f"⚠️ Stylesheet not found: {css_path}")
 
     def _build_ui(self):
         central = QWidget()
@@ -59,28 +59,24 @@ class HomeView(QMainWindow):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
-        # Employee page
         self.page_employees = EmployeeView()
         self.emp_controller = EmployeeController(self.page_employees, self)
         self.emp_controller.load_employees()
 
-        # Sidebar (fixed width)
         self.sidebar = self._create_sidebar()
         self.sidebar.setFixedWidth(150)
         root.addWidget(self.sidebar)
 
-        # Main content area (stacked pages)
         self.stack = QStackedWidget()
         root.addWidget(self.stack, 1)
 
-        # Pages
         self.page_home = self._make_home_page()
-        self.page_vacations = VacationView(controller=None)  # Pass None for now
-        self.vac_controller = VacationController(self.page_vacations)  # This sets controller in view
+        self.page_vacations = VacationView(controller=None)
+        self.vac_controller = VacationController(self.page_vacations)
 
-        self.stack.addWidget(self.page_home)      # index 0
-        self.stack.addWidget(self.page_employees) # index 1
-        self.stack.addWidget(self.page_vacations) # index 2
+        self.stack.addWidget(self.page_home)
+        self.stack.addWidget(self.page_employees)
+        self.stack.addWidget(self.page_vacations)
 
         self.setCentralWidget(central)
 
@@ -90,7 +86,6 @@ class HomeView(QMainWindow):
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(12)
 
-        # Logo
         logo_path = self.project_root / "assets" / "icon.png"
         logo = QLabel()
         logo.setAlignment(Qt.AlignCenter)
@@ -103,7 +98,6 @@ class HomeView(QMainWindow):
 
         layout.addWidget(logo)
 
-        # Buttons
         self.btn_home = QPushButton("Home")
         self.btn_employees = QPushButton("Employees")
         self.btn_vacations = QPushButton("Vacations")
@@ -115,12 +109,10 @@ class HomeView(QMainWindow):
 
         layout.addStretch(1)
 
-        # Connect
         self.btn_home.clicked.connect(lambda: self.stack.setCurrentIndex(0))
         self.btn_employees.clicked.connect(lambda: self.stack.setCurrentIndex(1))
         self.btn_vacations.clicked.connect(lambda: self.stack.setCurrentIndex(2))
 
-        # Separator
         sep = QFrame()
         sep.setFrameShape(QFrame.HLine)
         sep.setFrameShadow(QFrame.Sunken)
@@ -134,12 +126,11 @@ class HomeView(QMainWindow):
         v.setContentsMargins(24, 24, 24, 24)
         v.setSpacing(12)
 
-        title = QLabel("Accueil – Calendrier de l'entreprise")
+        title = QLabel("Company Vacation Calendar")
         title.setObjectName("h1")
 
-        # Combo box for employees currently on vacation (always up to date)
         self.combo_vacation_employees = QComboBox()
-        self.combo_vacation_employees.setPlaceholderText("Employés en congé")
+        self.combo_vacation_employees.setPlaceholderText("Employees on vacation")
         self.combo_vacation_employees.setCursor(Qt.PointingHandCursor)
         self.combo_vacation_employees.setStyleSheet(
             """
@@ -191,7 +182,6 @@ class HomeView(QMainWindow):
 
         self.calendar = CalendarView()
 
-        # Fill combo with all employees who have vacations
         self._update_vacation_employees_combo()
         self.combo_vacation_employees.currentIndexChanged.connect(self._highlight_employee_vacation)
 
@@ -200,7 +190,6 @@ class HomeView(QMainWindow):
         v.addWidget(self.calendar, 1)
         return page
 
-    # --------------------------- FEATURES --------------------------- #
     def _update_vacation_employees_combo(self):
         """Fill combo with all employees who have at least one vacation."""
         self.combo_vacation_employees.clear()
@@ -225,7 +214,6 @@ class HomeView(QMainWindow):
         if not vacations:
             return
 
-        # Find the latest vacation by created_at
         latest_vacation = max(vacations, key=lambda v: v["created_at"])
         start = QDate.fromString(latest_vacation["start_date"], "yyyy-MM-dd")
         end = QDate.fromString(latest_vacation["end_date"], "yyyy-MM-dd")
@@ -247,5 +235,4 @@ class HomeView(QMainWindow):
 
     def closeEvent(self, event):
         """Override close event to perform any cleanup if needed."""
-        # TODO: Save window state/geometry if required
         event.accept()

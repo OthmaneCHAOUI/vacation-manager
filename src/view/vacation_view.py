@@ -26,16 +26,13 @@ class VacationView(QWidget):
         layout.setContentsMargins(24, 24, 24, 24)
         layout.setSpacing(20)
 
-        # --- Title ---
-        title = QLabel("Congés")
+        title = QLabel("Vacations")
         title.setObjectName("h1")
         layout.addWidget(title)
 
-        # --- Form ---
         form_layout = QHBoxLayout()
         form_layout.setSpacing(12)
 
-        # Employee dropdown
         self.employee_combo = QComboBox()
         self.employee_combo.setMinimumWidth(150)
         self.employee_combo.setCursor(Qt.PointingHandCursor)
@@ -86,7 +83,7 @@ class VacationView(QWidget):
             }
             """
         )
-        self.employee_combo.setPlaceholderText("Sélectionner un employé")
+        self.employee_combo.setPlaceholderText("Select an employee")
 
         dateedit_style = """
         QDateEdit {
@@ -136,8 +133,8 @@ class VacationView(QWidget):
         self.start_date_input.setDate(QDate.currentDate())
         self.start_date_input.setStyleSheet(dateedit_style)
         self.start_date_input.setMinimumWidth(130)
-        self.start_date_input.setLocale(QLocale(QLocale.French))
-        self.start_date_input.calendarWidget().setLocale(QLocale(QLocale.French))
+        self.start_date_input.setLocale(QLocale(QLocale.English))
+        self.start_date_input.calendarWidget().setLocale(QLocale(QLocale.English))
 
         self.end_date_input = QDateEdit()
         self.end_date_input.setCalendarPopup(True)
@@ -146,11 +143,10 @@ class VacationView(QWidget):
         self.end_date_input.setDate(QDate.currentDate())
         self.end_date_input.setStyleSheet(dateedit_style)
         self.end_date_input.setMinimumWidth(130)
-        self.end_date_input.setLocale(QLocale(QLocale.French))
-        self.end_date_input.calendarWidget().setLocale(QLocale(QLocale.French))
+        self.end_date_input.setLocale(QLocale(QLocale.English))
+        self.end_date_input.calendarWidget().setLocale(QLocale(QLocale.English))
 
-        # Button to add vacation request
-        self.add_button = QPushButton("Ajouter un congé")
+        self.add_button = QPushButton("Add Vacation")
         self.add_button.setCursor(Qt.PointingHandCursor)
         self.add_button.setStyleSheet(
             """
@@ -166,7 +162,6 @@ class VacationView(QWidget):
             """
         )
 
-        # Add employee_layout to form_layout
         employee_layout = QVBoxLayout()
         employee_layout.addWidget(self.employee_combo)
 
@@ -176,7 +171,6 @@ class VacationView(QWidget):
         end_layout = QVBoxLayout()
         end_layout.addWidget(self.end_date_input)
 
-        # Add widgets to form layout
         form_layout.addLayout(employee_layout)
         form_layout.addLayout(start_layout)
         form_layout.addLayout(end_layout)
@@ -184,11 +178,10 @@ class VacationView(QWidget):
 
         layout.addLayout(form_layout)
 
-        # --- Vacation Table ---
         self.table = QTableWidget()
         self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels(
-            ["Employé", "Début", "Fin", "Statut", "Créé le"]
+            ["Employee", "Start Date", "End Date", "Status", "Created At"]
         )
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.setSelectionBehavior(self.table.SelectRows)
@@ -215,8 +208,7 @@ class VacationView(QWidget):
         self.table.verticalHeader().setVisible(False)
         layout.addWidget(self.table, 1)
 
-        # --- Delete button ---
-        self.delete_button = QPushButton("Supprimer la sélection")
+        self.delete_button = QPushButton("Delete Selected")
         self.delete_button.setCursor(Qt.PointingHandCursor)
         self.delete_button.clicked.connect(self.on_delete_selected)
         self.delete_button.setStyleSheet(
@@ -233,13 +225,6 @@ class VacationView(QWidget):
             """
         )
         layout.addWidget(self.delete_button)
-
-        # Optionally load custom stylesheet
-        # try:
-        #     with open("src/style/vacation_style.css", "r", encoding="utf-8") as f:
-        #         self.setStyleSheet(f.read())
-        # except Exception:
-        #     pass
 
     def display_vacations(self, vacations):
         """
@@ -260,13 +245,11 @@ class VacationView(QWidget):
             self.table.setItem(row, 4, QTableWidgetItem(vac["created_at"]))
             self.row_to_vac_id[row] = vac["id"]
 
-            # Highlight past vacations
             end_date = QDate.fromString(vac["end_date"], "yyyy-MM-dd")
             if end_date < today:
                 for col in range(self.table.columnCount()):
                     item = self.table.item(row, col)
                     if item:
-                        # Semi-transparent gray
                         item.setBackground(QColor(100, 100, 100, 80))
 
     def set_employee_list(self, employees):
@@ -278,12 +261,14 @@ class VacationView(QWidget):
             )
 
     def confirm_delete(self, count: int) -> bool:
-        """Affiche une popup de confirmation avant la suppression des congés."""
+        """Show a confirmation dialog before deleting vacation requests."""
         msg = QMessageBox(self)
-        msg.setWindowTitle("Confirmation de suppression")
-        msg.setText(f"Voulez-vous vraiment supprimer {count} demande(s) de congé ?")
+        msg.setWindowTitle("Confirm Deletion")
+        msg.setText(f"Are you sure you want to delete {count} vacation request(s)?")
         msg.setIcon(QMessageBox.Warning)
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg.button(QMessageBox.Yes).setText("Yes")
+        msg.button(QMessageBox.No).setText("No")
         msg.setDefaultButton(QMessageBox.No)
         msg.setStyleSheet(
             """

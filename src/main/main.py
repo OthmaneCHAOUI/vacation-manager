@@ -15,8 +15,7 @@ def check_database():
             conn.close()
         except sqlite3.DatabaseError:
             print("Database corrupted. Removing and recreating...")
-            DB_PATH.unlink()  # delete the corrupted file
-    # Initialize tables (will create new DB if file was removed)
+            DB_PATH.unlink()
     init_db()
 
 

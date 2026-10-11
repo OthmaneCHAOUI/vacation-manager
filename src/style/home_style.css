@@ -2,8 +2,6 @@ QMainWindow {
     background: #0f172a;
 }
 
-/* slate-900 */
-
 QWidget {
     color: #e5e7eb;
     font-size: 14px;

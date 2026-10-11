@@ -1,5 +1,3 @@
-# src/view/calendar_view.py
-
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QCalendarWidget
 from PyQt5.QtCore import QDate, QLocale
 from PyQt5.QtGui import QTextCharFormat, QColor
@@ -15,7 +13,7 @@ class CalendarView(QWidget):
         layout = QVBoxLayout(self)
 
         self.calendar = QCalendarWidget()
-        self.calendar.setLocale(QLocale(QLocale.French))  # <-- Ajoutez cette ligne
+        self.calendar.setLocale(QLocale(QLocale.English))
         self.calendar.setDateEditEnabled(False)
         self.calendar.setGridVisible(True)
         self.calendar.setFirstDayOfWeek(1)  # Monday
@@ -33,7 +31,7 @@ class CalendarView(QWidget):
             with open("src/style/calendar_style.css", "r", encoding="utf-8") as f:
                 self.calendar.setStyleSheet(f.read())
         except FileNotFoundError:
-            print("⚠️ Fichier CSS non trouvé : src/style/calendar_style.css")
+            print("⚠️ Calendar stylesheet not found: src/style/calendar_style.css")
 
     def get_selected_date(self):
         """Return the selected QDate."""
@@ -55,7 +53,7 @@ class CalendarView(QWidget):
         """Highlight a list of QDate objects in the calendar."""
         self.clear_highlighted_days()
         fmt = QTextCharFormat()
-        fmt.setBackground(QColor("#9400D3"))  # darkviolet for vacation days
+        fmt.setBackground(QColor("#9400D3"))
         for qdate in qdate_list:
             if qdate != QDate.currentDate():
                 self.calendar.setDateTextFormat(qdate, fmt)
