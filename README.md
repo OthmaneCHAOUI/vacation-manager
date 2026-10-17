@@ -225,6 +225,7 @@ vacation-manager/
 │       └── vacation_view.py
 ├── config.py
 ├── requirements.txt
+├── LICENSE
 ├── README.md
 └── .gitignore
 ```

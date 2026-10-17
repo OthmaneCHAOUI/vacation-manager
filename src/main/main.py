@@ -3,7 +3,7 @@ from pathlib import Path
 import sqlite3
 from PyQt5.QtWidgets import QApplication
 from src.view.home_view import HomeView
-from src.model.database import init_db, DB_PATH
+from src.database.database import init_db, DB_PATH
 
 
 def check_database():

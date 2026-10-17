@@ -1,4 +1,4 @@
-from src.model.database import get_connection
+from src.database.database import get_connection
 
 
 class VacationModel:
