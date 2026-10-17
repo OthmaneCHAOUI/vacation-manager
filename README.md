@@ -132,12 +132,6 @@ source .venv/bin/activate
 python3 -m pip install -r requirements.txt
 ```
 
-If the requirements file does not include all required packages, install PyQt5 separately:
-
-```bash
-python3 -m pip install PyQt5
-```
-
 ### 4. Launch the application
 
 From the project root:
@@ -150,7 +144,7 @@ The application initializes the database schema through its database module.
 
 ## Configuration
 
-The application uses `config.py` for project configuration and `src/model/database.py` for database initialization and connections.
+Database configuration and initialization are handled by `src/database/database.py`.
 
 When running from source, the SQLite database is located in:
 
@@ -158,13 +152,15 @@ When running from source, the SQLite database is located in:
 src/data/database.db
 ```
 
-When running a packaged executable, the database is stored in the user's application data directory so it persists between launches:
+When running from source, the database directory is created automatically if it does not exist. The local database file is ignored by Git.
+
+When running a packaged executable, the application uses the user's application data directory:
 
 - **Windows:** `%LOCALAPPDATA%\vacation-manager\database.db`
 - **Linux:** `$XDG_DATA_HOME/vacation-manager/database.db`, or `~/.local/share/vacation-manager/database.db` when `XDG_DATA_HOME` is not set
 - **macOS:** `~/Library/Application Support/vacation-manager/database.db`
 
-If a previous packaged build stored a database beside its bundled files and that file is still available, the application copies it to the persistent location the first time it starts. Data that only existed in a temporary extraction directory and was deleted when the old executable closed cannot be recovered.
+If a previous packaged build stored a database beside its bundled files and that file is still available, the application copies it to the persistent location the first time it starts. Packaged-app persistence still needs to be validated for each target platform and release.
 
 ## Usage
 
@@ -180,7 +176,11 @@ If a previous packaged build stored a database beside its bundled files and that
 
 ## Testing
 
-Automated tests are not currently documented in this repository.
+No automated test suite is currently included in the repository. Python source compilation can be checked with:
+
+```bash
+python3 -m compileall -q src
+```
 
 The following manual checks are recommended when validating a build:
 
@@ -204,33 +204,30 @@ vacation-manager/
 │   │   ├── __init__.py
 │   │   ├── employee_controller.py
 │   │   └── vacation_controller.py
-│   ├── data/
-│   │   └── database.db
+│   ├── database/
+│   │   └── database.py
 │   ├── main/
 │   │   └── main.py
 │   ├── model/
 │   │   ├── __init__.py
-│   │   ├── database.py
 │   │   ├── employee_model.py
 │   │   └── vacation_model.py
 │   ├── style/
 │   │   ├── calendar_style.css
-│   │   ├── employee_style.css
-│   │   ├── home_style.css
-│   │   └── vacation_style.css
+│   │   └── home_style.css
 │   └── view/
+│       ├── __init__.py
 │       ├── calendar_view.py
 │       ├── employee_view.py
 │       ├── home_view.py
 │       └── vacation_view.py
-├── config.py
 ├── requirements.txt
 ├── LICENSE
 ├── README.md
 └── .gitignore
 ```
 
-The project also uses a PyInstaller specification file when configured for executable packaging.
+PyInstaller packaging uses a local `vacman.spec` file when available. The specification file and generated build output are currently ignored by Git.
 
 ## Development
 
@@ -244,7 +241,7 @@ python3 -m src.main.main
 
 ### Build an executable
 
-Build using the PyInstaller specification file:
+If a local `vacman.spec` file is available, build with:
 
 ```bash
 python3 -m PyInstaller --clean --noconfirm --distpath bin vacman.spec
@@ -272,16 +269,16 @@ PyQt5 provides the widgets, tables, forms, dialogs, and calendar-related interfa
 
 ### PyInstaller for distribution
 
-PyInstaller packages the Python application and its dependencies into a Windows executable, allowing users to launch the application without manually setting up the Python environment.
+PyInstaller packages the Python application and its dependencies into an executable for the operating system on which it is built. Separate builds and validation are required for Windows, Linux, and macOS.
 
 ## Limitations
 
 - The application is designed primarily for local desktop use.
 - User authentication and role-based access control are not implemented.
 - SQLite storage is local rather than a shared, centralized database.
-- Automated test coverage is not yet documented.
+- No automated test suite is currently included.
 - Database schema consistency and persistent storage paths must be verified when packaging or upgrading the application.
-- The packaged application currently targets Windows distribution; other platforms may require separate packaging and testing.
+- Packaging configuration and generated build output are not tracked, so reproducible release builds still need to be established.
 
 ## Roadmap
 
@@ -289,12 +286,18 @@ PyInstaller packages the Python application and its dependencies into a Windows 
 - [x] Vacation management interface.
 - [x] SQLite database integration.
 - [x] Calendar and custom interface styling.
-- [x] Initial Windows executable packaging.
+- [x] Initial PyInstaller packaging groundwork.
 - [ ] Add automated tests for employee and vacation operations.
 - [ ] Make database storage persistent and reliable across packaged application restarts.
 - [ ] Add database schema migrations.
 - [ ] Improve packaging and release documentation.
-- [ ] Add screenshots and a demonstration to the README.
+- [x] Add screenshots to the README.
+- [ ] Add a more complete application demonstration.
+- [ ] Validate numeric employee input before conversion.
+- [ ] Recalculate used vacation days after vacation deletion.
+- [ ] Define whether approved and rejected requests count toward allowance usage.
+- [ ] Consolidate duplicated vacation model operations.
+- [ ] Decide whether vacation approval workflows are in scope.
 
 ## Contributing
 
