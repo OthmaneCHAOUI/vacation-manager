@@ -22,7 +22,7 @@ htmlcov/
 build/
 dist/
 *.egg-info/
-*.spec
+# *.spec
 *.exe
 bin/*
 
