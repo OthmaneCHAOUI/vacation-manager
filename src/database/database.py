@@ -74,6 +74,13 @@ def init_db():
             """
         )
 
+        columns = {
+            row["name"]
+            for row in cur.execute("PRAGMA table_info(vacation)").fetchall()
+        }
+        if "reason" not in columns:
+            cur.execute("ALTER TABLE vacation ADD COLUMN reason TEXT DEFAULT ''")
+
         cur.execute("CREATE INDEX IF NOT EXISTS idx_vac_emp ON vacation(employee_id);")
         cur.execute(
             "CREATE INDEX IF NOT EXISTS idx_vac_dates ON vacation(start_date, end_date);"
