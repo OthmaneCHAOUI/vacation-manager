@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QCalendarWidget
 from PyQt5.QtCore import QDate, QLocale
 from PyQt5.QtGui import QTextCharFormat, QColor
@@ -27,11 +29,12 @@ class CalendarView(QWidget):
 
     def load_stylesheet(self):
         """Load CSS for calendar styling."""
+        css_path = Path(__file__).resolve().parents[2] / "src" / "style" / "calendar_style.css"
         try:
-            with open("src/style/calendar_style.css", "r", encoding="utf-8") as f:
+            with open(css_path, "r", encoding="utf-8") as f:
                 self.calendar.setStyleSheet(f.read())
         except FileNotFoundError:
-            print("⚠️ Calendar stylesheet not found: src/style/calendar_style.css")
+            print(f"⚠️ Calendar stylesheet not found: {css_path}")
 
     def get_selected_date(self):
         """Return the selected QDate."""

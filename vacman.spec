@@ -1,26 +1,20 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from pathlib import Path
+
+PROJECT_ROOT = Path(SPECPATH).resolve()
 
 a = Analysis(
-    ['src/main/main.py'],
-    pathex=['.'],
+    [str(PROJECT_ROOT / 'src' / 'main' / 'main.py')],
+    pathex=[str(PROJECT_ROOT)],
     binaries=[],
     datas=[
-        ('src/style/home_style.css', 'src/style'),
-        ('src/style/calendar_style.css', 'src/style'),
-        ('assets/icons/icon.png', 'assets/icons'),
+        (str(PROJECT_ROOT / 'src' / 'style' / 'home_style.css'), 'src/style'),
+        (str(PROJECT_ROOT / 'src' / 'style' / 'calendar_style.css'), 'src/style'),
+        (str(PROJECT_ROOT / 'src' / 'data' / 'database.db'), 'src/data'),
+        (str(PROJECT_ROOT / 'assets' / 'icons' / 'icon.png'), 'assets/icons'),
     ],
-    hiddenimports=[
-        'src.view.home_view',
-        'src.view.employee_view',
-        'src.view.vacation_view',
-        'src.view.calendar_view',
-        'src.controller.employee_controller',
-        'src.controller.vacation_controller',
-        'src.model.vacation_model',
-        'src.model.employee_model',
-        'src.database.database',
-    ],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -43,7 +37,7 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
