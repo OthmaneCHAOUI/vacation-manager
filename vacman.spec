@@ -8,7 +8,7 @@ a = Analysis(
     datas=[
         ('src/style/home_style.css', 'src/style'),
         ('src/style/calendar_style.css', 'src/style'),
-        ('assets/icon.png', 'assets'),
+        ('assets/icons/icon.png', 'assets/icons'),
     ],
     hiddenimports=[
         'src.view.home_view',
@@ -20,8 +20,6 @@ a = Analysis(
         'src.model.vacation_model',
         'src.model.employee_model',
         'src.database.database',
-        'src.utils.holidays',
-        'src.data.database',
     ],
     hookspath=[],
     hooksconfig={},

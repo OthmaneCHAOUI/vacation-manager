@@ -38,7 +38,7 @@ class HomeView(QMainWindow):
         shortcut.activated.connect(self.close)
 
         self.project_root = Path(__file__).resolve().parents[2]
-        icon_path = self.project_root / "assets" / "icon.png"
+        icon_path = self.project_root / "assets" / "icons" / "icon.png"
         if icon_path.exists():
             self.setWindowIcon(QIcon(str(icon_path)))
 
@@ -86,7 +86,7 @@ class HomeView(QMainWindow):
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(12)
 
-        logo_path = self.project_root / "assets" / "icon.png"
+        logo_path = self.project_root / "assets" / "icons" / "icon.png"
         logo = QLabel()
         logo.setAlignment(Qt.AlignCenter)
         if logo_path.exists():

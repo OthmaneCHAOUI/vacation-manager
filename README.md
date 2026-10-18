@@ -111,7 +111,7 @@ cd vacation-manager
 ### 2. Create a virtual environment
 
 ```bash
-python3 -m venv .venv
+python -m venv .venv
 ```
 
 Activate it on Windows:
@@ -129,7 +129,7 @@ source .venv/bin/activate
 ### 3. Install dependencies
 
 ```bash
-python3 -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ### 4. Launch the application
@@ -137,7 +137,7 @@ python3 -m pip install -r requirements.txt
 From the project root:
 
 ```bash
-python3 -m src.main.main
+python -m src.main.main
 ```
 
 The application initializes the database schema through its database module.
@@ -179,7 +179,7 @@ If a previous packaged build stored a database beside its bundled files and that
 No automated test suite is currently included in the repository. Python source compilation can be checked with:
 
 ```bash
-python3 -m compileall -q src
+python -m compileall -q src
 ```
 
 The following manual checks are recommended when validating a build:
@@ -198,7 +198,8 @@ The following manual checks are recommended when validating a build:
 ```text
 vacation-manager/
 ├── assets/
-│   ├── icon.png
+│   ├── icons/
+│   │   └── icon.png
 ├── src/
 │   ├── controller/
 │   │   ├── __init__.py
@@ -227,7 +228,7 @@ vacation-manager/
 └── .gitignore
 ```
 
-PyInstaller packaging uses a local `vacman.spec` file when available. The specification file and generated build output are currently ignored by Git.
+PyInstaller packaging uses a local `vacman.spec` file when available.
 
 ## Development
 
@@ -236,7 +237,7 @@ PyInstaller packaging uses a local `vacman.spec` file when available. The specif
 Activate the virtual environment, install the dependencies, and run:
 
 ```bash
-python3 -m src.main.main
+python -m src.main.main
 ```
 
 ### Build an executable
@@ -244,7 +245,7 @@ python3 -m src.main.main
 If a local `vacman.spec` file is available, build with:
 
 ```bash
-python3 -m PyInstaller --clean --noconfirm --distpath bin vacman.spec
+python -m PyInstaller --clean --noconfirm --distpath bin vacman.spec
 ```
 
 The generated executable is placed in `bin/`. PyInstaller builds for the operating system on which it runs; building on Linux produces a Linux executable, not a Windows `.exe`.
