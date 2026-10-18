@@ -1,13 +1,17 @@
 from src.model.vacation_model import VacationModel
 from src.model.employee_model import EmployeeModel
+from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox
 from datetime import datetime
 
 
-class VacationController:
+class VacationController(QObject):
     """Handles the logic between the VacationView and VacationModel."""
 
+    vacation_added = pyqtSignal()
+
     def __init__(self, view):
+        super().__init__()
         self.view = view
         self.view.controller = self
         self.view.add_button.clicked.connect(self.add_vacation)
@@ -119,6 +123,7 @@ class VacationController:
         EmployeeModel.update_vacation_used(emp_id, total_used)
 
         self.load_vacations()
+        self.vacation_added.emit()
 
         if hasattr(self.view, "parent") and hasattr(self.view.parent(), "emp_controller"):
             self.view.parent().emp_controller.load_employees()

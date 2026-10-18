@@ -73,6 +73,9 @@ class HomeView(QMainWindow):
         self.page_home = self._make_home_page()
         self.page_vacations = VacationView(controller=None)
         self.vac_controller = VacationController(self.page_vacations)
+        self.vac_controller.vacation_added.connect(
+            self.refresh_vacation_employees
+        )
 
         self.stack.addWidget(self.page_home)
         self.stack.addWidget(self.page_employees)
