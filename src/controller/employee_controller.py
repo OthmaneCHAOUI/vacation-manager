@@ -10,11 +10,11 @@ class EmployeeController:
         self.view.controller = self
 
     def load_employees(self):
-        employees = EmployeeModel.get_all()
+        employees = EmployeeModel.get_all_employees()
         self.view.load_employees(employees)
 
     def add_employee(self, data):
-        EmployeeModel.create(
+        EmployeeModel.add_employee(
             data["first_name"],
             data["last_name"],
             data.get("position", ""),
@@ -35,7 +35,8 @@ class EmployeeController:
             data.get("vacation_used", 0),
         )
         self.load_employees()
+        self.home_view.refresh_vacation_employees()
 
     def delete_employee(self, emp_id):
-        EmployeeModel.delete(emp_id)
+        EmployeeModel.remove_employee(emp_id)
         self.load_employees()

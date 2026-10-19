@@ -20,7 +20,7 @@ class VacationController(QObject):
 
     def load_employees(self):
         """Loads employee data and populates the view's employee combo box."""
-        employees = EmployeeModel.get_all()
+        employees = EmployeeModel.get_all_employees()
         self.view.set_employee_list(employees)
 
     def load_vacations(self):
@@ -76,7 +76,7 @@ class VacationController(QObject):
         end_dt = datetime.strptime(end_date_str, "%Y-%m-%d")
         new_vac_days = (end_dt - start_dt).days + 1
 
-        emp = EmployeeModel.get_by_id(emp_id)
+        emp = EmployeeModel.get_employee_by_id(emp_id)
         total_credit = emp["last_year_remaining"] + emp["vacation_credit"]
 
         vacations = VacationModel.get_all_vacations()
@@ -118,7 +118,7 @@ class VacationController(QObject):
             msg_box.exec_()
             return
 
-        VacationModel.add(emp_id, start_date_str, end_date_str, "")
+        VacationModel.add_vacation(emp_id, start_date_str, end_date_str, "")
 
         EmployeeModel.update_vacation_used(emp_id, total_used)
 
@@ -130,5 +130,5 @@ class VacationController(QObject):
 
     def delete_vacation(self, vac_ids):
         """Deletes one or more vacation requests by ID and reloads the view."""
-        VacationModel.delete(vac_ids)
+        VacationModel.remove_vacations(vac_ids)
         self.load_vacations()
