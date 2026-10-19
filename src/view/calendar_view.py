@@ -40,17 +40,17 @@ class CalendarView(QWidget):
         """Return the selected QDate."""
         return self.calendar.selectedDate()
 
-    def set_min_max_date(self, min_date: QDate, max_date: QDate):
-        """Set minimum and maximum selectable dates."""
-        self.calendar.setMinimumDate(min_date)
-        self.calendar.setMaximumDate(max_date)
+    # def set_min_max_date(self, min_date: QDate, max_date: QDate):
+    #     """Set minimum and maximum selectable dates."""
+    #     self.calendar.setMinimumDate(min_date)
+    #     self.calendar.setMaximumDate(max_date)
 
-    def on_date_changed(self, callback):
-        """
-        Connect a callback to date selection change.
-        Callback must accept a QDate.
-        """
-        self.calendar.selectionChanged.connect(lambda: callback(self.get_selected_date()))
+    # def on_date_changed(self, callback):
+    #     """
+    #     Connect a callback to date selection change.
+    #     Callback must accept a QDate.
+    #     """
+    #     self.calendar.selectionChanged.connect(lambda: callback(self.get_selected_date()))
 
     def highlight_days(self, qdate_list):
         """Highlight a list of QDate objects in the calendar."""

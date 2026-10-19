@@ -4,20 +4,20 @@ from src.database.database import get_connection
 class VacationModel:
     """Manages operations on the vacation table."""
 
-    @staticmethod
-    def get_all():
-        """Returns all vacation requests with employee details."""
-        with get_connection() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                """
-                SELECT v.*, e.first_name, e.last_name
-                FROM vacation v
-                JOIN employee e ON v.employee_id = e.id
-                ORDER BY v.start_date DESC
-                """
-            )
-            return cur.fetchall()
+    # @staticmethod
+    # def get_all():
+    #     """Returns all vacation requests with employee details."""
+    #     with get_connection() as conn:
+    #         cur = conn.cursor()
+    #         cur.execute(
+    #             """
+    #             SELECT v.*, e.first_name, e.last_name
+    #             FROM vacation v
+    #             JOIN employee e ON v.employee_id = e.id
+    #             ORDER BY v.start_date DESC
+    #             """
+    #         )
+    #         return cur.fetchall()
 
     @staticmethod
     def add(employee_id, start_date, end_date, reason=""):
@@ -33,19 +33,19 @@ class VacationModel:
             )
             conn.commit()
 
-    @staticmethod
-    def update_status(vacation_id, status):
-        """Updates the status of a request (approved|rejected|pending)."""
-        with get_connection() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                """
-                UPDATE vacation SET status = ?
-                WHERE id = ?
-                """,
-                (status, vacation_id),
-            )
-            conn.commit()
+    # @staticmethod
+    # def update_status(vacation_id, status):
+    #     """Updates the status of a request (approved|rejected|pending)."""
+    #     with get_connection() as conn:
+    #         cur = conn.cursor()
+    #         cur.execute(
+    #             """
+    #             UPDATE vacation SET status = ?
+    #             WHERE id = ?
+    #             """,
+    #             (status, vacation_id),
+    #         )
+    #         conn.commit()
 
     @staticmethod
     def delete(vacation_ids):
@@ -73,21 +73,21 @@ class VacationModel:
             )
             return cur.fetchall()
 
-    @staticmethod
-    def get_employees_on_date(date_str):
-        """Returns employees on vacation for a given date."""
-        with get_connection() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                """
-                SELECT e.first_name || ' ' || e.last_name AS name
-                FROM vacation v
-                JOIN employee e ON v.employee_id = e.id
-                WHERE v.start_date <= ? AND v.end_date >= ?
-                """,
-                (date_str, date_str),
-            )
-            return [row["name"] for row in cur.fetchall()]
+    # @staticmethod
+    # def get_employees_on_date(date_str):
+    #     """Returns employees on vacation for a given date."""
+    #     with get_connection() as conn:
+    #         cur = conn.cursor()
+    #         cur.execute(
+    #             """
+    #             SELECT e.first_name || ' ' || e.last_name AS name
+    #             FROM vacation v
+    #             JOIN employee e ON v.employee_id = e.id
+    #             WHERE v.start_date <= ? AND v.end_date >= ?
+    #             """,
+    #             (date_str, date_str),
+    #         )
+    #         return [row["name"] for row in cur.fetchall()]
 
     @staticmethod
     def get_vacations_for_employee_by_name(emp_name):
@@ -121,17 +121,17 @@ class VacationModel:
             )
             return [row["name"] for row in cur.fetchall()]
 
-    @staticmethod
-    def update(vac_id, start_date, end_date, status):
-        """Updates a vacation request in the database."""
-        with get_connection() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                """
-                UPDATE vacation
-                SET start_date = ?, end_date = ?, status = ?
-                WHERE id = ?
-                """,
-                (start_date, end_date, status, vac_id),
-            )
-            conn.commit()
+    # @staticmethod
+    # def update(vac_id, start_date, end_date, status):
+    #     """Updates a vacation request in the database."""
+    #     with get_connection() as conn:
+    #         cur = conn.cursor()
+    #         cur.execute(
+    #             """
+    #             UPDATE vacation
+    #             SET start_date = ?, end_date = ?, status = ?
+    #             WHERE id = ?
+    #             """,
+    #             (start_date, end_date, status, vac_id),
+    #         )
+    #         conn.commit()
