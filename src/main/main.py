@@ -11,8 +11,10 @@ def check_database():
     if DB_PATH.exists():
         try:
             conn = sqlite3.connect(DB_PATH)
-            conn.execute("PRAGMA integrity_check;")
+            result = conn.execute("PRAGMA integrity_check;").fetchone()
             conn.close()
+            if result[0] != "ok":
+                raise sqlite3.DatabaseError("integrity check failed")
         except sqlite3.DatabaseError:
             print("Database corrupted. Removing and recreating...")
             DB_PATH.unlink()
