@@ -42,6 +42,3 @@ holidays.py
 
 # Keep source package __init__ files tracked
 !src/**/__init__.py
-
-# Documentation files
-ROADMAP.md
