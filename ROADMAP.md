@@ -1,6 +1,6 @@
 # Vacation Manager roadmap
 
-Last reviewed: 10/24/2026
+Last reviewed: 10/30/2026
 
 This roadmap separates DONE work, active defects, product decisions, and
 future improvements.
@@ -257,4 +257,4 @@ future improvements.
 | **Medium** | The packaged database and resource paths were previously vulnerable to missing files or working-directory differences. | Bundle the database seed and resources, resolve paths from the application/spec location, and verify the packaged archive. | **Closed** |
 | **Medium** | Packaging configuration was previously undocumented or inconsistent with the source tree. | Track `vacman.spec`, remove stale hidden imports, document platform-specific builds, and keep generated output ignored. | **Closed** |
 | **Low** | The local database contains non-reproducible development data. | Use clean test databases and fixtures; keep the local database ignored. | **Open** |
-| **Low** | The README and roadmap previously contained stale or inconsistent references and incomplete demonstration material. | Keep documentation synchronized with the actual modules, commands, features, and release behavior. | **Open** |
+| **Low** | The README and roadmap previously contained stale or inconsistent references and incomplete demonstration material. | Keep documentation synchronized with the actual modules, commands, features, and release behavior. | **Closed** |

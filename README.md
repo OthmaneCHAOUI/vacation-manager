@@ -193,6 +193,21 @@ The following manual checks are recommended when validating a build:
 - [ ] Close and reopen the application and confirm that data persists.
 - [ ] Test the packaged executable independently of the development environment.
 
+The roadmap in [ROADMAP.md](ROADMAP.md) contains the detailed backlog,
+implementation issues, product decisions, and release work. The current
+implementation has known gaps that should be considered when validating a
+release:
+
+- The vacation allowance path currently expects an employee identifier that
+  is not returned by the general vacation listing query.
+- Deleting a vacation does not recalculate the employee's stored used-day
+  total.
+- Employee numeric fields are not fully validated before conversion.
+- Database and loading failures are not consistently surfaced as actionable
+  UI errors.
+- The calendar currently highlights the latest-created vacation for an
+  employee rather than a defined current or nearest upcoming period.
+
 ## Project Structure
 
 ```text
@@ -211,7 +226,9 @@ vacation-manager/
 │   │   └── main.py
 │   ├── model/
 │   │   ├── __init__.py
+│   │   ├── employee.py
 │   │   ├── employee_model.py
+│   │   ├── vacation.py
 │   │   └── vacation_model.py
 │   ├── style/
 │   │   ├── calendar_style.css
@@ -223,6 +240,7 @@ vacation-manager/
 │       ├── home_view.py
 │       └── vacation_view.py
 ├── requirements.txt
+├── ROADMAP.md
 ├── LICENSE
 ├── README.md
 └── .gitignore
@@ -283,22 +301,22 @@ PyInstaller packages the Python application and its dependencies into an executa
 
 ## Roadmap
 
-- [x] Employee management interface.
-- [x] Vacation management interface.
-- [x] SQLite database integration.
-- [x] Calendar and custom interface styling.
-- [x] Initial PyInstaller packaging groundwork.
-- [ ] Add automated tests for employee and vacation operations.
-- [ ] Make database storage persistent and reliable across packaged application restarts.
-- [ ] Add database schema migrations.
-- [ ] Improve packaging and release documentation.
-- [x] Add screenshots to the README.
-- [ ] Add a more complete application demonstration.
-- [ ] Validate numeric employee input before conversion.
-- [ ] Recalculate used vacation days after vacation deletion.
-- [ ] Define whether approved and rejected requests count toward allowance usage.
-- [ ] Consolidate duplicated vacation model operations.
-- [ ] Decide whether vacation approval workflows are in scope.
+The detailed roadmap is maintained in [ROADMAP.md](ROADMAP.md). In summary,
+the core employee, vacation, calendar, SQLite persistence, and initial
+PyInstaller packaging work is complete. Remaining work includes:
+
+- Adding automated model, controller, UI, migration, persistence, and
+  packaging tests.
+- Fixing the vacation listing/allowance data mismatch and recalculating used
+  vacation days after deletion.
+- Adding schema migrations, input validation, explicit database error
+  handling, and consistent transaction boundaries.
+- Defining vacation status, overlap, approval, holiday, and regional-calendar
+  policies before implementing related behavior.
+- Improving calendar selection, vacation editing, import/export, dashboards,
+  release operations, and platform-specific packaging verification.
+- Reviewing privacy, permissions, file handling, and authentication before
+  supporting shared or multi-user use.
 
 ## Contributing
 
