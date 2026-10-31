@@ -71,6 +71,9 @@ class HomeView(QMainWindow):
 
         self.page_vacations = VacationView(controller=None)
         self.vac_controller = VacationController(self.page_vacations)
+        self.emp_controller.employee_changed.connect(
+            self.vac_controller.load_employees
+        )
         self.vac_controller.vacation_changed.connect(
             self.refresh_vacation_employees
         )
