@@ -67,7 +67,10 @@ vacation-manager follows an MVC-inspired architecture.
 
 - **Model:** Handles database access and employee/vacation data operations.
 - **View:** Displays the graphical interface, tables, forms, and calendar.
-- **Controller:** Connects user interactions to model operations and refreshes the interface.
+- **Controller:** Coordinates user interactions, model operations, services, and
+  refresh signals.
+- **Service:** Contains reusable, UI-independent vacation calculations such as
+  inclusive date ranges, allowance totals, and used-day totals.
 
 ```text
 User
@@ -77,15 +80,17 @@ View (PyQt5)
  │
  ▼
 Controller
- │
- ▼
-Model
- │
- ▼
-SQLite Database
+ ├──────────────► Service
+ │                  │
+ └──────────────► Model
+                    │
+                    ▼
+             SQLite Database
 ```
 
-This separation makes the application easier to navigate and maintain by keeping interface code separate from database operations.
+Views do not query the database directly. Employee and vacation controllers
+emit change signals so the main window can refresh related views without
+controllers depending on one another.
 
 ## Requirements
 
@@ -152,7 +157,7 @@ When running from source, the SQLite database is located in:
 src/data/database.db
 ```
 
-When running from source, the database directory is created automatically if it does not exist. The local database file is ignored by Git.
+When running from source, the database directory is created automatically if it does not exist. The local database file is ignored by Git. SQLite foreign-key enforcement is enabled on the shared application connection.
 
 When running a packaged executable, the application uses the user's application data directory:
 
@@ -195,18 +200,9 @@ The following manual checks are recommended when validating a build:
 
 The roadmap in [ROADMAP.md](ROADMAP.md) contains the detailed backlog,
 implementation issues, product decisions, and release work. The current
-implementation has known gaps that should be considered when validating a
-release:
-
-- The vacation allowance path currently expects an employee identifier that
-  is not returned by the general vacation listing query.
-- Deleting a vacation does not recalculate the employee's stored used-day
-  total.
-- Employee numeric fields are not fully validated before conversion.
-- Database and loading failures are not consistently surfaced as actionable
-  UI errors.
-- The calendar currently highlights the latest-created vacation for an
-  employee rather than a defined current or nearest upcoming period.
+implementation highlights the latest-created vacation for the selected
+employee; selecting the nearest current or upcoming period remains a planned
+product decision.
 
 ## Project Structure
 
@@ -230,6 +226,9 @@ vacation-manager/
 │   │   ├── employee_model.py
 │   │   ├── vacation.py
 │   │   └── vacation_model.py
+│   ├── service/
+│   │   ├── __init__.py
+│   │   └── vacation_service.py
 │   ├── style/
 │   │   ├── calendar_style.css
 │   │   └── home_style.css
@@ -302,13 +301,12 @@ PyInstaller packages the Python application and its dependencies into an executa
 ## Roadmap
 
 The detailed roadmap is maintained in [ROADMAP.md](ROADMAP.md). In summary,
-the core employee, vacation, calendar, SQLite persistence, and initial
-PyInstaller packaging work is complete. Remaining work includes:
+the core employee, vacation, calendar, SQLite persistence, MVC boundary
+refactor, centralized vacation calculations, and initial PyInstaller packaging
+work is complete. Remaining work includes:
 
 - Adding automated model, controller, UI, migration, persistence, and
   packaging tests.
-- Fixing the vacation listing/allowance data mismatch and recalculating used
-  vacation days after deletion.
 - Adding schema migrations, input validation, explicit database error
   handling, and consistent transaction boundaries.
 - Defining vacation status, overlap, approval, holiday, and regional-calendar

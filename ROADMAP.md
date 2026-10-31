@@ -1,6 +1,6 @@
 # Vacation Manager roadmap
 
-Last reviewed: 10/30/2026
+Last reviewed: 10/31/2026
 
 This roadmap separates DONE work, active defects, product decisions, and
 future improvements.
@@ -27,8 +27,8 @@ future improvements.
   values, carryover days, and used days.
 - [ ] Add a single transaction for creating a vacation and updating the
   employee's used-day total.
-- [ ] Recalculate `employee.vacation_used` from vacation records after
-  deletion, editing, migration, or recovery.
+- [ ] Recalculate `employee.vacation_used` from vacation records after editing,
+  migration, or recovery.
 - [ ] Decide whether pending, approved, and rejected requests count toward
   allowance usage, then enforce that policy consistently.
 - [ ] Decide whether overlapping vacation periods are allowed and validate the
@@ -51,6 +51,8 @@ future improvements.
 - [x] Add an allowance check before creating a vacation.
 - [x] Add employee filtering and vacation-day highlighting in the calendar.
 - [x] Add custom styling, application icon, and keyboard close shortcut.
+- [x] Refresh employee and calendar data through controller change signals.
+- [x] Preserve the selected employee when refreshing the calendar selector.
 
 ### TODO
 
@@ -77,6 +79,7 @@ future improvements.
 - [x] Highlight the current day.
 - [x] Filter the calendar by employee.
 - [x] Apply custom calendar styling.
+- [x] Move inclusive vacation date expansion into the vacation service.
 
 ### TODO
 
@@ -134,14 +137,15 @@ future improvements.
   sync.
 - [ ] Handle missing, unreadable, locked, or permission-denied database files
   explicitly.
-- [ ] Make foreign-key enforcement explicit for every SQLite connection.
+- [x] Enable SQLite foreign-key enforcement on the shared application
+  connection.
 - [ ] Validate empty, malformed, negative, and non-numeric employee inputs
   before calling `int(...)`.
 - [ ] Prevent invalid date ranges, invalid statuses, and negative allowance
   values at both UI and model boundaries.
 - [ ] Consolidate duplicated or unused vacation model operations.
-- [ ] Move business rules out of views and controllers into testable services
-  or model-level helpers.
+- [x] Move vacation date and allowance calculations out of views and into a
+  testable service.
 - [ ] Define logging and error-reporting behavior for production builds.
 
 ---
@@ -156,13 +160,13 @@ future improvements.
 
 ### TODO
 
-- [ ] Complete the refactor of misplaced functions and logic currently handled
+- [x] Complete the refactor of misplaced functions and logic currently handled
   by the wrong layers.
-- [ ] Establish clear interfaces between views, controllers, and models.
+- [x] Establish clear interfaces between views, controllers, and models.
 - [ ] Remove empty constructors and unused imports or methods.
 - [ ] Introduce shared types or data-transfer objects for employee and vacation
   records.
-- [ ] Centralize date calculations, allowance calculations, and validation.
+- [x] Centralize date and allowance calculations in the vacation service.
 - [ ] Add consistent formatting, linting, and type-checking configuration.
 - [ ] Document architectural boundaries and data-flow decisions.
 - [ ] Keep resource paths independent of the current working directory in every
@@ -247,10 +251,10 @@ future improvements.
 
 | Severity | Problem | Fix | State |
 |---|---|---|---|
-| **High** | Vacation allowance calculation reads `vac["employee_id"]`, but `get_all_vacations()` does not select `employee_id`; adding a vacation can therefore fail with a missing-column lookup. | Include the employee ID in the query or calculate usage with a dedicated employee-scoped query, then add a regression test. | **Open** |
+| **High** | Vacation allowance calculation previously relied on an employee identifier that was missing from the vacation listing contract. | Return stable employee-linked vacation rows and use employee-scoped queries for allowance calculations. | **Closed** |
 | **High** | The calendar employee selector highlights the latest-created vacation rather than the nearest current or upcoming vacation. | Define the intended selection rule and select the current or nearest upcoming period accordingly. | **Open** |
-| **High** | `HomeView` catches every exception while loading employees with vacations and displays an empty state, masking database and schema failures. | Catch specific expected errors, log the failure, and show an actionable error state to the user. | **Open** |
-| **Medium** | Deleting a vacation does not recalculate the employee's `vacation_used` value. | Recompute usage from the remaining records in the same transaction as deletion. | **Open** |
+| **High** | `HomeView` previously caught every exception while loading employees with vacations and displayed an empty state, masking database and schema failures. | Remove the broad view-level fallback and handle expected database failures explicitly at the appropriate boundary. | **Closed** |
+| **Medium** | Deleting a vacation previously did not recalculate the employee's `vacation_used` value. | Recompute usage from the remaining records after deletion. | **Closed** |
 | **Medium** | Numeric employee fields are converted without complete validation. | Validate required, numeric, non-negative values at the view and model boundaries. | **Open** |
 | **Medium** | The database schema is changed through an inline `reason` column check without versioned migrations. | Add migration versions and tests for fresh and existing databases. | **Open** |
 | **Medium** | Vacation allowance policy is not defined for pending, approved, and rejected requests. | Choose the policy and apply it consistently to validation, totals, calendar display, and reports. | **Open** |
