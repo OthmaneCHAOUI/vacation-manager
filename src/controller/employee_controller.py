@@ -40,3 +40,4 @@ class EmployeeController:
     def delete_employee(self, emp_id):
         EmployeeModel.remove_employee(emp_id)
         self.load_employees()
+        self.home_view.refresh_vacation_employees()

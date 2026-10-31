@@ -260,6 +260,14 @@ class VacationView(QWidget):
                 f"{emp['first_name']} {emp['last_name']}", emp["id"]
             )
 
+    def show_error(self, text):
+        """Display an error message for the vacation form."""
+        QMessageBox.critical(self, "Error", text)
+
+    def show_warning(self, title, text):
+        """Display a warning message for the vacation form."""
+        QMessageBox.warning(self, title, text)
+
     def confirm_delete(self, count: int) -> bool:
         """Show a confirmation dialog before deleting vacation requests."""
         msg = QMessageBox(self)

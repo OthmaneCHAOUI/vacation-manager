@@ -1,14 +1,13 @@
 from src.model.vacation_model import VacationModel
 from src.model.employee_model import EmployeeModel
+from src.service.vacation_service import total_used_days, used_vacation_days
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QMessageBox
-from datetime import datetime
 
 
 class VacationController(QObject):
     """Handles the logic between the VacationView and VacationModel."""
 
-    vacation_added = pyqtSignal()
+    vacation_changed = pyqtSignal()
 
     def __init__(self, view):
         super().__init__()
@@ -28,94 +27,48 @@ class VacationController(QObject):
         vacations = VacationModel.get_all_vacations()
         self.view.display_vacations(vacations)
 
+    def get_employees_with_vacation(self):
+        """Return employees with vacation requests for the home view."""
+        return VacationModel.get_all_employees_with_vacation()
+
+    def get_latest_vacation_for_employee(self, emp_id):
+        """Return the latest vacation for an employee."""
+        vacations = VacationModel.get_vacations_for_employee_by_id(emp_id)
+        return vacations[0] if vacations else None
+
     def add_vacation(self):
         """Gets vacation details from the form and adds a new record to the database."""
         emp_index = self.view.employee_combo.currentIndex()
         if emp_index == -1:
-            msg_box = QMessageBox(self.view)
-            msg_box.setWindowTitle("Error")
-            msg_box.setText("Please select an employee.")
-            msg_box.setStyleSheet("""
-                QMessageBox {
-                    background-color: #1f2937;
-                    color: #f8fafc;
-                    font-size: 14px;
-                }
-                QPushButton {
-                    background-color: #374151;
-                    color: #f8fafc;
-                    padding: 6px 14px;
-                    border-radius: 6px;
-                    font-weight: 600;
-                }
-                QPushButton:hover { background-color: #2563eb; }
-                QPushButton:pressed { background-color: #1d4ed8; }
-            """)
-            msg_box.exec_()
+            self.view.show_error("Please select an employee.")
             return
 
         start_date = self.view.start_date_input.date()
         end_date = self.view.end_date_input.date()
         if start_date > end_date:
-            msg_box = QMessageBox(
-                QMessageBox.Warning,
+            self.view.show_warning(
                 "Invalid Dates",
                 "The end date cannot be before the start date.",
-                QMessageBox.Ok,
-                self.view,
             )
-            msg_box.button(QMessageBox.Ok).setText("OK")
-            msg_box.exec_()
             return
 
         emp_id = self.view.employee_combo.itemData(emp_index)
         start_date_str = start_date.toString("yyyy-MM-dd")
         end_date_str = end_date.toString("yyyy-MM-dd")
 
-        start_dt = datetime.strptime(start_date_str, "%Y-%m-%d")
-        end_dt = datetime.strptime(end_date_str, "%Y-%m-%d")
-        new_vac_days = (end_dt - start_dt).days + 1
-
         emp = EmployeeModel.get_employee_by_id(emp_id)
         total_credit = emp["last_year_remaining"] + emp["vacation_credit"]
 
-        vacations = VacationModel.get_all_vacations()
-        used_days = 0
-        for vac in vacations:
-            if vac["employee_id"] == emp_id:
-                vac_start = datetime.strptime(vac["start_date"], "%Y-%m-%d")
-                vac_end = datetime.strptime(vac["end_date"], "%Y-%m-%d")
-                used_days += (vac_end - vac_start).days + 1
-        total_used = used_days + new_vac_days
+        vacations = VacationModel.get_vacations_for_employee_by_id(emp_id)
+        total_used = total_used_days(vacations, start_date_str, end_date_str)
 
         if total_used > total_credit:
-            msg_box = QMessageBox(self.view)
-            msg_box.setWindowTitle("Vacation Allowance Exceeded")
-            msg_box.setText(
+            self.view.show_warning(
+                "Vacation Allowance Exceeded",
                 f"The employee does not have enough vacation allowance.\n"
                 f"Total allowance: {total_credit} days\n"
-                f"Requested after addition: {total_used} days"
+                f"Requested after addition: {total_used} days",
             )
-            msg_box.setIcon(QMessageBox.Warning)
-            msg_box.setStandardButtons(QMessageBox.Ok)
-            msg_box.button(QMessageBox.Ok).setText("OK")
-            msg_box.setStyleSheet("""
-                QMessageBox {
-                    background-color: #1f2937;
-                    color: #f8fafc;
-                    font-size: 15px;
-                }
-                QPushButton {
-                    background-color: #2563eb;
-                    color: #f8fafc;
-                    padding: 8px 18px;
-                    border-radius: 8px;
-                    font-weight: 600;
-                }
-                QPushButton:hover { background-color: #1d4ed8; }
-                QPushButton:pressed { background-color: #1e40af; }
-            """)
-            msg_box.exec_()
             return
 
         VacationModel.add_vacation(emp_id, start_date_str, end_date_str, "")
@@ -123,12 +76,16 @@ class VacationController(QObject):
         EmployeeModel.update_vacation_used(emp_id, total_used)
 
         self.load_vacations()
-        self.vacation_added.emit()
-
-        if hasattr(self.view, "parent") and hasattr(self.view.parent(), "emp_controller"):
-            self.view.parent().emp_controller.load_employees()
+        self.vacation_changed.emit()
 
     def delete_vacation(self, vac_ids):
         """Deletes one or more vacation requests by ID and reloads the view."""
+        employee_ids = VacationModel.get_employee_ids_for_vacations(vac_ids)
         VacationModel.remove_vacations(vac_ids)
+        for emp_id in employee_ids:
+            vacations = VacationModel.get_vacations_for_employee_by_id(emp_id)
+            EmployeeModel.update_vacation_used(
+                emp_id, used_vacation_days(vacations)
+            )
         self.load_vacations()
+        self.vacation_changed.emit()

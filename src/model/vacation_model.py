@@ -13,7 +13,7 @@ class VacationModel:
             cur = conn.cursor()
             cur.execute(
                 """
-                SELECT v.id, e.first_name || ' ' || e.last_name AS employee_name, v.start_date, v.end_date, v.reason, v.status
+                SELECT v.id, v.employee_id, e.first_name, e.last_name, v.start_date, v.end_date, v.reason, v.status, v.created_at
                 FROM vacation v
                 JOIN employee e ON v.employee_id = e.id
                 ORDER BY v.start_date DESC
@@ -38,6 +38,8 @@ class VacationModel:
     @staticmethod
     def remove_vacations(vacation_ids):
         """Deletes one or more vacation requests by ID."""
+        if not vacation_ids:
+            return
         with get_connection() as conn:
             cur = conn.cursor()
             placeholders = ",".join(["?"] * len(vacation_ids))
@@ -45,6 +47,20 @@ class VacationModel:
                 f"DELETE FROM vacation WHERE id IN ({placeholders})", vacation_ids
             )
             conn.commit()
+
+    @staticmethod
+    def get_employee_ids_for_vacations(vacation_ids):
+        """Return employee IDs associated with vacation IDs."""
+        if not vacation_ids:
+            return []
+        with get_connection() as conn:
+            cur = conn.cursor()
+            placeholders = ",".join(["?"] * len(vacation_ids))
+            cur.execute(
+                f"SELECT DISTINCT employee_id FROM vacation WHERE id IN ({placeholders})",
+                vacation_ids,
+            )
+            return [row["employee_id"] for row in cur.fetchall()]
 
     @staticmethod
     def get_vacations_for_employee_by_id(emp_id):
@@ -55,8 +71,7 @@ class VacationModel:
                 """
                 SELECT v.start_date, v.end_date, v.created_at
                 FROM vacation v
-                JOIN employee e ON v.employee_id = e.id
-                WHERE e.id = ?
+                WHERE v.employee_id = ?
                 ORDER BY v.created_at DESC
                 """,
                 (emp_id,),
@@ -64,46 +79,16 @@ class VacationModel:
             return cur.fetchall()
 
     @staticmethod
-    def get_vacations_for_employee_by_name(emp_name):
-        """Returns vacation requests for a specific employee name."""
+    def get_all_employees_with_vacation():
+        """Returns employees with vacation requests."""
         with get_connection() as conn:
             cur = conn.cursor()
-            first, last = emp_name.split(" ", 1)
             cur.execute(
                 """
-                SELECT v.start_date, v.end_date, v.created_at
+                SELECT DISTINCT e.id, e.first_name, e.last_name
                 FROM vacation v
                 JOIN employee e ON v.employee_id = e.id
-                WHERE e.first_name = ? AND e.last_name = ?
-                ORDER BY v.created_at DESC
-                """,
-                (first, last),
+                ORDER BY e.last_name ASC, e.first_name ASC
+                """
             )
             return cur.fetchall()
-
-    @staticmethod
-    def get_all_employees_with_vacation():
-        """Returns a list of all employees who have a vacation request."""
-        with get_connection() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                """
-                SELECT DISTINCT e.first_name || ' ' || e.last_name AS name
-                FROM vacation v
-                JOIN employee e ON v.employee_id = e.id
-                """
-            )
-            return [row["name"] for row in cur.fetchall()]
-
-    @staticmethod
-    def get_vacation_by_id(vacation_id):
-        """Returns a specific vacation request by ID."""
-        with get_connection() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                """
-                SELECT * FROM vacation WHERE id = ?
-                """,
-                (vacation_id,),
-            )
-            return cur.fetchone()

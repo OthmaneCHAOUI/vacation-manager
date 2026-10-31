@@ -20,6 +20,7 @@ class Database:
                 self.db_path.parent.mkdir(parents=True, exist_ok=True)
             self.connection = sqlite3.connect(self.db_path)
             self.connection.row_factory = sqlite3.Row
+            self.connection.execute("PRAGMA foreign_keys = ON")
         return self.connection
 
     @staticmethod

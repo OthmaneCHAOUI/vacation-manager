@@ -13,13 +13,11 @@ from PyQt5.QtWidgets import (
     QStackedWidget,
     QVBoxLayout,
     QWidget,
-    QMessageBox,
     QShortcut,
     QComboBox,
 )
 from src.view.employee_view import EmployeeView
 from src.controller.employee_controller import EmployeeController
-from src.model.vacation_model import VacationModel
 from src.view.calendar_view import CalendarView
 from src.controller.vacation_controller import VacationController
 from src.view.vacation_view import VacationView
@@ -70,12 +68,15 @@ class HomeView(QMainWindow):
         self.stack = QStackedWidget()
         root.addWidget(self.stack, 1)
 
-        self.page_home = self._make_home_page()
         self.page_vacations = VacationView(controller=None)
         self.vac_controller = VacationController(self.page_vacations)
-        self.vac_controller.vacation_added.connect(
+        self.vac_controller.vacation_changed.connect(
             self.refresh_vacation_employees
         )
+        self.vac_controller.vacation_changed.connect(
+            self.emp_controller.load_employees
+        )
+        self.page_home = self._make_home_page()
 
         self.stack.addWidget(self.page_home)
         self.stack.addWidget(self.page_employees)
@@ -196,30 +197,28 @@ class HomeView(QMainWindow):
     def _update_vacation_employees_combo(self):
         """Fill combo with all employees who have at least one vacation."""
         self.combo_vacation_employees.clear()
-        try:
-            employees = VacationModel.get_all_employees_with_vacation()
-        except Exception:
-            employees = []
+        employees = self.vac_controller.get_employees_with_vacation()
         if employees:
             for emp in employees:
-                self.combo_vacation_employees.addItem(emp)
+                self.combo_vacation_employees.addItem(
+                    f"{emp['first_name']} {emp['last_name']}", emp["id"]
+                )
         else:
             self.combo_vacation_employees.addItem("No employees on vacation")
 
     def _highlight_employee_vacation(self):
         """Highlight the latest vacation days of the selected employee in the calendar."""
-        emp_name = self.combo_vacation_employees.currentText()
-        if not emp_name or emp_name == "No employees on vacation":
+        emp_id = self.combo_vacation_employees.currentData()
+        if emp_id is None:
             self.calendar.clear_highlighted_days()
             return
 
-        vacations = VacationModel.get_vacations_for_employee_by_name(emp_name)
-        if not vacations:
+        vacation = self.vac_controller.get_latest_vacation_for_employee(emp_id)
+        if vacation is None:
             return
 
-        latest_vacation = max(vacations, key=lambda v: v["created_at"])
-        start = QDate.fromString(latest_vacation["start_date"], "yyyy-MM-dd")
-        end = QDate.fromString(latest_vacation["end_date"], "yyyy-MM-dd")
+        start = QDate.fromString(vacation["start_date"], "yyyy-MM-dd")
+        end = QDate.fromString(vacation["end_date"], "yyyy-MM-dd")
         highlighted_dates = []
         d = QDate(start)
         while d <= end:
