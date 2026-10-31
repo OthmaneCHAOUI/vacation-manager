@@ -1,12 +1,16 @@
+from PyQt5.QtCore import QObject, pyqtSignal
+
 from src.model.employee_model import EmployeeModel
 
 
-class EmployeeController:
+class EmployeeController(QObject):
     """Controller for employee actions."""
 
-    def __init__(self, view, home_view):
+    employee_changed = pyqtSignal()
+
+    def __init__(self, view):
+        super().__init__()
         self.view = view
-        self.home_view = home_view
         self.view.controller = self
 
     def load_employees(self):
@@ -22,7 +26,7 @@ class EmployeeController:
             data.get("last_year_remaining", 0),
         )
         self.load_employees()
-        self.home_view.refresh_vacation_employees()
+        self.employee_changed.emit()
 
     def update_employee(self, emp_id, data):
         EmployeeModel.update(
@@ -35,9 +39,9 @@ class EmployeeController:
             data.get("vacation_used", 0),
         )
         self.load_employees()
-        self.home_view.refresh_vacation_employees()
+        self.employee_changed.emit()
 
     def delete_employee(self, emp_id):
         EmployeeModel.remove_employee(emp_id)
         self.load_employees()
-        self.home_view.refresh_vacation_employees()
+        self.employee_changed.emit()

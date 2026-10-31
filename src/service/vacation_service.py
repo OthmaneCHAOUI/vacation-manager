@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 DATE_FORMAT = "%Y-%m-%d"
@@ -24,3 +24,13 @@ def total_used_days(vacations, additional_start, additional_end):
     return used_vacation_days(vacations) + vacation_days(
         additional_start, additional_end
     )
+
+
+def vacation_date_strings(start_date, end_date):
+    """Return every date in an inclusive vacation interval."""
+    start = datetime.strptime(start_date, DATE_FORMAT)
+    end = datetime.strptime(end_date, DATE_FORMAT)
+    return [
+        (start + timedelta(days=day)).strftime(DATE_FORMAT)
+        for day in range((end - start).days + 1)
+    ]

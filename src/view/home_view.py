@@ -2,13 +2,11 @@ from pathlib import Path
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
 from PyQt5.QtWidgets import (
-    QApplication,
     QFrame,
     QHBoxLayout,
     QLabel,
     QMainWindow,
     QPushButton,
-    QScrollArea,
     QSizePolicy,
     QStackedWidget,
     QVBoxLayout,
@@ -58,7 +56,10 @@ class HomeView(QMainWindow):
         root.setSpacing(0)
 
         self.page_employees = EmployeeView()
-        self.emp_controller = EmployeeController(self.page_employees, self)
+        self.emp_controller = EmployeeController(self.page_employees)
+        self.emp_controller.employee_changed.connect(
+            self.refresh_vacation_employees
+        )
         self.emp_controller.load_employees()
 
         self.sidebar = self._create_sidebar()
@@ -213,26 +214,25 @@ class HomeView(QMainWindow):
             self.calendar.clear_highlighted_days()
             return
 
-        vacation = self.vac_controller.get_latest_vacation_for_employee(emp_id)
-        if vacation is None:
+        highlighted_dates = [
+            QDate.fromString(date, "yyyy-MM-dd")
+            for date in self.vac_controller.get_latest_vacation_dates(emp_id)
+        ]
+        if not highlighted_dates:
+            self.calendar.clear_highlighted_days()
             return
 
-        start = QDate.fromString(vacation["start_date"], "yyyy-MM-dd")
-        end = QDate.fromString(vacation["end_date"], "yyyy-MM-dd")
-        highlighted_dates = []
-        d = QDate(start)
-        while d <= end:
-            highlighted_dates.append(QDate(d))
-            d = d.addDays(1)
         self.calendar.highlight_days(highlighted_dates)
-        self.calendar.calendar.setSelectedDate(start)
+        self.calendar.calendar.setSelectedDate(highlighted_dates[0])
 
     def refresh_vacation_employees(self):
         """Call this after employee/vacation changes to update the vacation employees list."""
+        selected_emp_id = self.combo_vacation_employees.currentData()
         self._update_vacation_employees_combo()
-        current_emp = self.combo_vacation_employees.currentText()
-        if current_emp:
-            index = self.combo_vacation_employees.findText(current_emp)
+        if selected_emp_id is not None:
+            index = self.combo_vacation_employees.findData(selected_emp_id)
+            if index < 0 and self.combo_vacation_employees.count() > 0:
+                index = 0
             self.combo_vacation_employees.setCurrentIndex(index)
 
     def closeEvent(self, event):

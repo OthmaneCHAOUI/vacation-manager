@@ -1,6 +1,10 @@
 from src.model.vacation_model import VacationModel
 from src.model.employee_model import EmployeeModel
-from src.service.vacation_service import total_used_days, used_vacation_days
+from src.service.vacation_service import (
+    total_used_days,
+    used_vacation_days,
+    vacation_date_strings,
+)
 from PyQt5.QtCore import QObject, pyqtSignal
 
 
@@ -35,6 +39,13 @@ class VacationController(QObject):
         """Return the latest vacation for an employee."""
         vacations = VacationModel.get_vacations_for_employee_by_id(emp_id)
         return vacations[0] if vacations else None
+
+    def get_latest_vacation_dates(self, emp_id):
+        """Return the dates in the employee's latest vacation interval."""
+        vacation = self.get_latest_vacation_for_employee(emp_id)
+        if vacation is None:
+            return []
+        return vacation_date_strings(vacation["start_date"], vacation["end_date"])
 
     def add_vacation(self):
         """Gets vacation details from the form and adds a new record to the database."""
